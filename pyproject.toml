@@ -1,7 +1,69 @@
 [project]
-name = "fieldloop"
-version = "0.1.0"
-description = "Add your description here"
+name = "meteocast"
+description = "Bibliothèque et CLI Python pour récupérer des informations météo et des données de prévision."
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Gilles Faucherand", email = "gilles.faucherand@unil.ch" }]
+keywords = ["weather", "forecast", "meteo", "cli"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+    "Typing :: Typed",
+]
+dynamic = ["version"]
+dependencies = [
+    "typer>=0.12",
+    "httpx>=0.27",
+]
+
+[project.urls]
+Homepage = "https://github.com/gfoo/meteocast"
+Repository = "https://github.com/gfoo/meteocast"
+Issues = "https://github.com/gfoo/meteocast/issues"
+
+[project.scripts]
+meteocast = "meteocast.cli:main"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.6",
+    "pytest>=8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/meteocast/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/meteocast"]
+
+# --- Registre privé JFrog Artifactory (installation) ---------------------------
+# Décommenter et renseigner <host>/<repo> pour installer depuis Artifactory.
+# Fournir les identifiants via les variables d'environnement :
+#   UV_INDEX_ARTIFACTORY_USERNAME / UV_INDEX_ARTIFACTORY_PASSWORD
+# [[tool.uv.index]]
+# name = "artifactory"
+# url = "https://<host>/artifactory/api/pypi/<repo>/simple/"
+# default = false
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
