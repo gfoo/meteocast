@@ -6,10 +6,11 @@ informations météo et des données de prévision.
 - 🖥️ **CLI** : consultez la météo depuis votre terminal.
 - 🐍 **Bibliothèque** : intégrez la récupération de données dans votre code Python.
 
-> ℹ️ **État du projet** : le squelette (CLI Typer, client httpx, packaging,
-> distribution) est en place. Le branchement à une API météo réelle (Open-Meteo,
-> etc.) n'est pas encore implémenté — les commandes sortent proprement en
-> attendant.
+> ℹ️ **État du projet** : la récupération réelle est branchée sur
+> [Open-Meteo](https://open-meteo.com) (gratuit, sans clé API). L'accès aux
+> sources passe par une abstraction (`meteocast.providers`) prévue pour brancher
+> d'autres fournisseurs — de météo courante et/ou de prévision — via l'option
+> `--source` (CLI) ou l'argument `source=` (bibliothèque).
 
 ---
 
@@ -46,8 +47,12 @@ Commands:
   forecast  Affiche la prévision sur plusieurs jours pour une localité.
 
 $ meteocast forecast Lausanne --days 5
-Prévision sur 5 jours pour Lausanne
+Prévision sur 5 jours pour Lausanne, Suisse
+  2026-07-05 : 14.0 – 26.0 °C — Ciel dégagé
   ...
+
+# Choisir explicitement la source (par défaut : open-meteo)
+$ meteocast current Lausanne --source open-meteo
 ```
 
 ### Depuis un registre privé JFrog Artifactory
@@ -90,10 +95,13 @@ from meteocast import get_current, get_forecast
 weather = get_current("Lausanne")
 print(weather.location, weather.temperature_c, weather.description)
 
-# Prévision sur 5 jours
+# Prévision sur 5 jours (min / max par jour)
 forecast = get_forecast("Lausanne", days=5)
 for day in forecast.daily:
-    print(day.temperature_c, day.description)
+    print(day.date, day.temperature_min_c, day.temperature_max_c, day.description)
+
+# Choisir une source explicitement
+forecast = get_forecast("Lausanne", days=5, source="open-meteo")
 ```
 
 ### Depuis un registre privé JFrog Artifactory
