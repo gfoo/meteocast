@@ -1,0 +1,47 @@
+name: release
+
+# Publie sur PyPI quand un tag de version (v*) est poussé.
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      # Nécessaire pour le Trusted Publishing PyPI (OIDC) — aucun token stocké.
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Test
+        run: uv run pytest
+
+      - name: Build
+        run: uv build
+
+      - name: Publish to PyPI (Trusted Publishing)
+        run: uv publish
+
+      # --- Alternative : publication vers un registre privé JFrog Artifactory ---
+      # Remplacer l'étape ci-dessus par celle-ci (nécessite le secret
+      # ARTIFACTORY_TOKEN et l'URL de dépôt Artifactory) :
+      #
+      # - name: Publish to Artifactory
+      #   env:
+      #     UV_PUBLISH_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+      #   run: uv publish --publish-url https://<host>/artifactory/api/pypi/<repo>/
